@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Explorer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: #e2e8f0;
+        background: #0f172a;
+      }
+      header {
+        padding: 24px;
+        background: linear-gradient(180deg, #111827, #0f172a);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      header h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 2.4vw, 2.8rem);
+      }
+      header p {
+        margin: 0;
+        color: #94a3b8;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: calc(100vh - 160px);
+      }
+      aside {
+        padding: 24px;
+        border-right: 1px solid rgba(148, 163, 184, 0.12);
+        background: #111827;
+      }
+      .search-box {
+        margin-bottom: 16px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #94a3b8;
+      }
+      input[type="search"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      input[type="search"]:focus {
+        outline: none;
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+      }
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav li {
+        margin-bottom: 8px;
+      }
+      nav button {
+        width: 100%;
+        text-align: left;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 10px;
+        background: #1e293b;
+        color: #e2e8f0;
+        cursor: pointer;
+      }
+      nav button:hover,
+      nav button.active {
+        background: #0ea5e9;
+        color: #0f172a;
+      }
+      .viewer {
+        padding: 24px;
+        overflow: hidden;
+      }
+      .viewer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .viewer-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+      button#copy-button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+      }
+      button#copy-button:hover {
+        background: #1d4ed8;
+      }
+      pre {
+        margin: 0;
+        padding: 20px;
+        overflow: auto;
+        border-radius: 16px;
+        background: #020617;
+        color: #e2e8f0;
+        max-height: calc(100vh - 220px);
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      footer {
+        padding: 24px;
+        text-align: center;
+        color: #94a3b8;
+        background: #111827;
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          border-right: none;
+          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Code Explorer</h1>
+      <p>
+        Browse the repository files and view source directly in the browser.
+      </p>
+    </header>
+
+    <main>
+      <aside>
+        <div class="search-box">
+          <label for="file-filter">Filter files</label>
+          <input
+            id="file-filter"
+            type="search"
+            placeholder="Search file names..."
+          />
+        </div>
+        <nav>
+          <ul id="file-list"></ul>
+        </nav>
+      </aside>
+
+      <section class="viewer">
+        <div class="viewer-header">
+          <h2 id="file-title">Select a file</h2>
+          <button id="copy-button">Copy content</button>
+        </div>
+        <pre
+          id="file-content"
+        ><code>Pick a file from the list to view its code here.</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <p>Generated code explorer for the current repository.</p>
+    </footer>
+
+    <script>
+      const fileListElement = document.getElementById("file-list");
+      const fileFilter = document.getElementById("file-filter");
+      const fileTitle = document.getElementById("file-title");
+      const fileContent = document.getElementById("file-content");
+      const copyButton = document.getElementById("copy-button");
+      let files = [];
+      let currentFile = null;
+
+      function renderFileList(filter = "") {
+        fileListElement.innerHTML = "";
+        const normalizedFilter = filter.trim().toLowerCase();
+        const visibleFiles = files.filter((file) =>
+          file.path.toLowerCase().includes(normalizedFilter),
+        );
+
+        visibleFiles.forEach((file) => {
+          const item = document.createElement("li");
+          const button = document.createElement("button");
+          button.textContent = file.path;
+          button.type = "button";
+          button.addEventListener("click", () => selectFile(file.path));
+          if (currentFile === file.path) {
+            button.classList.add("active");
+          }
+          item.appendChild(button);
+          fileListElement.appendChild(item);
+        });
+      }
+
+      function selectFile(path) {
+        currentFile = path;
+        const file = files.find((item) => item.path === path);
+        if (!file) return;
+
+        fileTitle.textContent = file.path;
+        fileContent.textContent = file.content;
+        renderFileList(fileFilter.value);
+      }
+
+      async function loadFiles() {
+        try {
+          const response = await fetch("files.json");
+          const data = await response.json();
+          files = data.files;
+          renderFileList();
+          if (files.length > 0) {
+            selectFile(files[0].path);
+          }
+        } catch (error) {
+          fileTitle.textContent = "Failed to load files";
+          fileContent.textContent = error.message;
+        }
+      }
+
+      fileFilter.addEventListener("input", () =>
+        renderFileList(fileFilter.value),
+      );
+
+      copyButton.addEventListener("click", async () => {
+        if (!currentFile) return;
+        try {
+          await navigator.clipboard.writeText(fileContent.textContent);
+          copyButton.textContent = "Copied!";
+          setTimeout(() => {
+            copyButton.textContent = "Copy content";
+          }, 1500);
+        } catch (err) {
+          copyButton.textContent = "Copy failed";
+          setTimeout(() => {
+            copyButton.textContent = "Copy content";
+          }, 1500);
+        }
+      });
+
+      loadFiles();
+    </script>
+  </body>
+</html>
