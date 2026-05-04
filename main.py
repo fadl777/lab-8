@@ -39,7 +39,10 @@ def create_square():
         "max_speed": max_speed,
 
         # Exercise 7
-        "trail": []
+        "trail": [],
+
+        # Exercise 9
+        "target_size": size
     }
 
 # --- Exercise 4: collision function ---
@@ -56,16 +59,19 @@ squares = []
 for _ in range(5):
     sq = create_square()
     sq["size"] = 25
+    sq["target_size"] = 25
     squares.append(sq)
 
 for _ in range(10):
     sq = create_square()
     sq["size"] = 10
+    sq["target_size"] = 10
     squares.append(sq)
 
 for _ in range(30):
     sq = create_square()
     sq["size"] = 4
+    sq["target_size"] = 4
     squares.append(sq)
 
 # --- Main loop ---
@@ -90,6 +96,7 @@ while running:
 
             new_sq = create_square()
             new_sq["size"] = size
+            new_sq["target_size"] = size
 
             squares.append(new_sq)
             continue
@@ -114,21 +121,19 @@ while running:
                     square["vx"] += dx * dt
                     square["vy"] += dy * dt
 
-        # Exercise 5 + 6
+        # Exercise 5 + 6 + 9 (eating + growth system)
         for other in squares[:]:
             if other is square:
                 continue
 
             if check_collision(square, other):
 
-                # Exercise 5
                 if square["size"] > other["size"]:
-                    if other in squares:
-                        squares.remove(other)
-                        squares.append(create_square())
 
-                # Exercise 6
-                if square["size"] > other["size"]:
+                    # Exercise 9 (target growth)
+                    square["target_size"] += other["size"] * 0.2
+
+                    # Exercise 6 (still kept)
                     square["size"] += other["size"] * 0.2
 
                     if other in squares:
@@ -136,7 +141,19 @@ while running:
 
                         new_sq = create_square()
                         new_sq["size"] = other["size"]
+                        new_sq["target_size"] = other["size"]
                         squares.append(new_sq)
+
+                # Exercise 5 (still kept)
+                if square["size"] > other["size"]:
+                    if other in squares:
+                        squares.remove(other)
+                        squares.append(create_square())
+
+        # --- Exercise 9: animated growth ---
+        growth_speed = 100  # pixels per second
+        if square["size"] < square["target_size"]:
+            square["size"] += growth_speed * dt
 
         # Limit speed
         speed = math.hypot(square["vx"], square["vy"])
@@ -165,7 +182,7 @@ while running:
         elif square["y"] > HEIGHT:
             square["y"] = 0
 
-        # --- Exercise 8 ---
+        # Exercise 8
         if TEST_MODE_ON:
             speed = math.hypot(square["vx"], square["vy"])
             print(speed)
