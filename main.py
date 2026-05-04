@@ -19,7 +19,6 @@ MAX_SPEED = 120  # pixels per second
 def create_square():
     size = random.randint(MIN_SIZE, MAX_SIZE)
 
-    # bigger = slower
     max_speed = MAX_SPEED * (MAX_SIZE / size)
 
     return {
@@ -33,26 +32,23 @@ def create_square():
             random.randint(50, 255),
             random.randint(50, 255),
         ),
-        "life": random.uniform(30, 180),  # seconds
+        "life": random.uniform(30, 180),
         "max_speed": max_speed,
     }
 
-# --- Init squares (Exercise 1: mix sizes) ---
+# --- Init squares (Exercise 1) ---
 squares = []
 
-# 5 squares size 25
 for _ in range(5):
     sq = create_square()
     sq["size"] = 25
     squares.append(sq)
 
-# 10 squares size 10
 for _ in range(10):
     sq = create_square()
     sq["size"] = 10
     squares.append(sq)
 
-# 30 squares size 4
 for _ in range(30):
     sq = create_square()
     sq["size"] = 4
@@ -61,7 +57,7 @@ for _ in range(30):
 # --- Main loop ---
 running = True
 while running:
-    dt = clock.tick(60) / 1000  # delta time in seconds
+    dt = clock.tick(60) / 1000
 
     # Events
     for event in pygame.event.get():
@@ -70,10 +66,10 @@ while running:
 
     # --- Update ---
     for square in squares:
-        # Life system (Exercise 2: same size respawn)
+        # Exercise 2: same size respawn
         square["life"] -= dt
         if square["life"] <= 0:
-            size = square["size"]  # keep same size
+            size = square["size"]
 
             squares.remove(square)
 
@@ -83,11 +79,11 @@ while running:
             squares.append(new_sq)
             continue
 
-        # Random jitter (small randomness)
+        # Random jitter
         square["vx"] += random.uniform(-20, 20) * dt
         square["vy"] += random.uniform(-20, 20) * dt
 
-        # Interaction with others
+        # Interaction
         for other in squares:
             if other is square:
                 continue
@@ -97,12 +93,9 @@ while running:
             distance = math.hypot(dx, dy)
 
             if distance < 100:
-                # FLEE (small runs away from big)
                 if square["size"] < other["size"]:
                     square["vx"] -= dx * 2 * dt
                     square["vy"] -= dy * 2 * dt
-
-                # CHASE (big goes toward small)
                 elif square["size"] > other["size"]:
                     square["vx"] += dx * dt
                     square["vy"] += dy * dt
@@ -114,15 +107,20 @@ while running:
             square["vx"] *= scale
             square["vy"] *= scale
 
-        # Move (time-based)
+        # Move
         square["x"] += square["vx"] * dt
         square["y"] += square["vy"] * dt
 
-        # Bounce on walls
-        if square["x"] <= 0 or square["x"] >= WIDTH:
-            square["vx"] *= -1
-        if square["y"] <= 0 or square["y"] >= HEIGHT:
-            square["vy"] *= -1
+        # Exercise 3: screen wrapping
+        if square["x"] < 0:
+            square["x"] = WIDTH
+        elif square["x"] > WIDTH:
+            square["x"] = 0
+
+        if square["y"] < 0:
+            square["y"] = HEIGHT
+        elif square["y"] > HEIGHT:
+            square["y"] = 0
 
     # --- Draw ---
     screen.fill((0, 0, 0))
@@ -134,7 +132,6 @@ while running:
             (square["x"], square["y"], square["size"], square["size"]),
         )
 
-    # FPS display
     fps_text = font.render(f"FPS: {clock.get_fps():.1f}", True, (255, 255, 255))
     screen.blit(fps_text, (10, 10))
 
