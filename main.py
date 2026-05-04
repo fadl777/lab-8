@@ -92,7 +92,7 @@ while running:
         square["vx"] += random.uniform(-20, 20) * dt
         square["vy"] += random.uniform(-20, 20) * dt
 
-        # Interaction (Exercise 4 used here)
+        # Interaction (Exercise 4)
         for other in squares:
             if other is square:
                 continue
@@ -108,16 +108,29 @@ while running:
                     square["vx"] += dx * dt
                     square["vy"] += dy * dt
 
-        # --- Exercise 5 ---
+        # --- Exercise 5 + 6 ---
         for other in squares[:]:
             if other is square:
                 continue
 
             if check_collision(square, other):
+
+                # Exercise 5
                 if square["size"] > other["size"]:
                     if other in squares:
                         squares.remove(other)
                         squares.append(create_square())
+
+                # Exercise 6
+                if square["size"] > other["size"]:
+                    square["size"] += other["size"] * 0.2  # growth
+
+                    if other in squares:
+                        squares.remove(other)
+
+                        new_sq = create_square()
+                        new_sq["size"] = other["size"]
+                        squares.append(new_sq)
 
         # Limit speed
         speed = math.hypot(square["vx"], square["vy"])
