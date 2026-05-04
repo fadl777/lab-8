@@ -37,8 +37,26 @@ def create_square():
         "max_speed": max_speed,
     }
 
-# --- Init squares ---
-squares = [create_square() for _ in range(NUM_SQUARES)]
+# --- Init squares (Exercise 1: mix sizes) ---
+squares = []
+
+# 5 squares size 25
+for _ in range(5):
+    sq = create_square()
+    sq["size"] = 25
+    squares.append(sq)
+
+# 10 squares size 10
+for _ in range(10):
+    sq = create_square()
+    sq["size"] = 10
+    squares.append(sq)
+
+# 30 squares size 4
+for _ in range(30):
+    sq = create_square()
+    sq["size"] = 4
+    squares.append(sq)
 
 # --- Main loop ---
 running = True
