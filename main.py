@@ -15,6 +15,9 @@ MIN_SIZE = 10
 MAX_SIZE = 40
 MAX_SPEED = 120  # pixels per second
 
+# --- Exercise 8 ---
+TEST_MODE_ON = True
+
 # --- Create one square ---
 def create_square():
     size = random.randint(MIN_SIZE, MAX_SIZE)
@@ -35,7 +38,7 @@ def create_square():
         "life": random.uniform(30, 180),
         "max_speed": max_speed,
 
-        # --- Exercise 7 ---
+        # Exercise 7
         "trail": []
     }
 
@@ -111,7 +114,7 @@ while running:
                     square["vx"] += dx * dt
                     square["vy"] += dy * dt
 
-        # --- Exercise 5 + 6 ---
+        # Exercise 5 + 6
         for other in squares[:]:
             if other is square:
                 continue
@@ -146,7 +149,7 @@ while running:
         square["x"] += square["vx"] * dt
         square["y"] += square["vy"] * dt
 
-        # --- Exercise 7: Trails ---
+        # Exercise 7: Trails
         square["trail"].append((square["x"], square["y"]))
         if len(square["trail"]) > 30:
             square["trail"].pop(0)
@@ -161,6 +164,11 @@ while running:
             square["y"] = HEIGHT
         elif square["y"] > HEIGHT:
             square["y"] = 0
+
+        # --- Exercise 8 ---
+        if TEST_MODE_ON:
+            speed = math.hypot(square["vx"], square["vy"])
+            print(speed)
 
     # --- Draw ---
     screen.fill((0, 0, 0))
