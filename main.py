@@ -73,7 +73,8 @@ while running:
             running = False
 
     # --- Update ---
-    for square in squares:
+    for square in squares[:]:  # safe iteration copy
+
         # Exercise 2
         square["life"] -= dt
         if square["life"] <= 0:
@@ -106,6 +107,17 @@ while running:
                 elif square["size"] > other["size"]:
                     square["vx"] += dx * dt
                     square["vy"] += dy * dt
+
+        # --- Exercise 5 ---
+        for other in squares[:]:
+            if other is square:
+                continue
+
+            if check_collision(square, other):
+                if square["size"] > other["size"]:
+                    if other in squares:
+                        squares.remove(other)
+                        squares.append(create_square())
 
         # Limit speed
         speed = math.hypot(square["vx"], square["vy"])
