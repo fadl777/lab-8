@@ -70,11 +70,17 @@ while running:
 
     # --- Update ---
     for square in squares:
-        # Life system
+        # Life system (Exercise 2: same size respawn)
         square["life"] -= dt
         if square["life"] <= 0:
+            size = square["size"]  # keep same size
+
             squares.remove(square)
-            squares.append(create_square())
+
+            new_sq = create_square()
+            new_sq["size"] = size
+
+            squares.append(new_sq)
             continue
 
         # Random jitter (small randomness)
