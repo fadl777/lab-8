@@ -34,6 +34,9 @@ def create_square():
         ),
         "life": random.uniform(30, 180),
         "max_speed": max_speed,
+
+        # --- Exercise 7 ---
+        "trail": []
     }
 
 # --- Exercise 4: collision function ---
@@ -123,7 +126,7 @@ while running:
 
                 # Exercise 6
                 if square["size"] > other["size"]:
-                    square["size"] += other["size"] * 0.2  # growth
+                    square["size"] += other["size"] * 0.2
 
                     if other in squares:
                         squares.remove(other)
@@ -143,6 +146,11 @@ while running:
         square["x"] += square["vx"] * dt
         square["y"] += square["vy"] * dt
 
+        # --- Exercise 7: Trails ---
+        square["trail"].append((square["x"], square["y"]))
+        if len(square["trail"]) > 30:
+            square["trail"].pop(0)
+
         # Exercise 3
         if square["x"] < 0:
             square["x"] = WIDTH
@@ -158,6 +166,17 @@ while running:
     screen.fill((0, 0, 0))
 
     for square in squares:
+
+        # draw trail (Exercise 7)
+        for i in range(len(square["trail"]) - 1):
+            pygame.draw.line(
+                screen,
+                square["color"],
+                square["trail"][i],
+                square["trail"][i + 1],
+                2
+            )
+
         pygame.draw.rect(
             screen,
             square["color"],
