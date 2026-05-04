@@ -106,9 +106,21 @@ class Boid:
     # Explanation: For each nearby boid, get its velocity vector and sum them up. 
     # Then divide by the number of nearby boids to get the average velocity, 
     # and subtract the current boid's velocity to get the alignment steering force.
-    def _alignment(self, boids: List['Boid']) -> pygame.Vector2:
-        steer : pygame.Vector2 = pygame.Vector2(0, 0)
-        return steer
+    def _separation(self, boids: List['Boid']) -> pygame.Vector2:
+    steer = pygame.Vector2(0, 0)
+
+    for other in boids:
+        if other is self:
+            continue
+
+        dx = self.x - other.x
+        dy = self.y - other.y
+        distance = math.hypot(dx, dy)
+
+        if distance < config.SEPARATION_DISTANCE and distance > 0:
+            steer += pygame.Vector2(dx, dy) / distance
+
+    return steer
     
     # Cohesion: steer toward the average position of nearby boids: 
     # _cohesion returns a vector pointing toward the average position of nearby boids
@@ -134,6 +146,12 @@ class Boid:
         # using the defined strengths (*_STEER_STRENGTH) for each behavior.
 
         self._random_steer()
+
+        if config.SEPARATION_ON:
+            s = self._separation(boids)
+            self.vx += s.x * config.SEPARATION_STEER_STRENGTH
+            self.vy += s.y * config.SEPARATION_STEER_STRENGTH
+
 
         # Update the boid's position based on its velocity.
         self.x += self.vx * dt_seconds
