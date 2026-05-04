@@ -36,6 +36,14 @@ def create_square():
         "max_speed": max_speed,
     }
 
+# --- Exercise 4: collision function ---
+def check_collision(a, b) -> bool:
+    dx = a["x"] - b["x"]
+    dy = a["y"] - b["y"]
+    distance = math.hypot(dx, dy)
+    return distance < (a["size"] + b["size"])
+
+
 # --- Init squares (Exercise 1) ---
 squares = []
 
@@ -66,7 +74,7 @@ while running:
 
     # --- Update ---
     for square in squares:
-        # Exercise 2: same size respawn
+        # Exercise 2
         square["life"] -= dt
         if square["life"] <= 0:
             size = square["size"]
@@ -83,16 +91,15 @@ while running:
         square["vx"] += random.uniform(-20, 20) * dt
         square["vy"] += random.uniform(-20, 20) * dt
 
-        # Interaction
+        # Interaction (Exercise 4 used here)
         for other in squares:
             if other is square:
                 continue
 
-            dx = other["x"] - square["x"]
-            dy = other["y"] - square["y"]
-            distance = math.hypot(dx, dy)
+            if check_collision(square, other):
+                dx = other["x"] - square["x"]
+                dy = other["y"] - square["y"]
 
-            if distance < 100:
                 if square["size"] < other["size"]:
                     square["vx"] -= dx * 2 * dt
                     square["vy"] -= dy * 2 * dt
@@ -111,7 +118,7 @@ while running:
         square["x"] += square["vx"] * dt
         square["y"] += square["vy"] * dt
 
-        # Exercise 3: screen wrapping
+        # Exercise 3
         if square["x"] < 0:
             square["x"] = WIDTH
         elif square["x"] > WIDTH:
