@@ -59,15 +59,15 @@ class Boid:
     # Screen wrapping: if a boid goes off one edge of the screen, 
     # it should reappear on the opposite edge
     def _screen_wrap(self) -> None:
-    if self.x < 0:
-        self.x = config.WIDTH
-    elif self.x > config.WIDTH:
-        self.x = 0
+        if self.x < 0:
+            self.x = config.WIDTH
+        elif self.x > config.WIDTH:
+            self.x = 0
 
-    if self.y < 0:
-        self.y = config.HEIGHT
-    elif self.y > config.HEIGHT:
-        self.y = 0
+        if self.y < 0:
+            self.y = config.HEIGHT
+        elif self.y > config.HEIGHT:
+            self.y = 0
     
     # Default wall behavior is bounce: if a boid hits the edge of the screen, 
     # it should bounce back in the opposite direction
@@ -81,13 +81,13 @@ class Boid:
 
     # TODO: Implement Random Steering of the velocity vector to create more natural movement
     def _random_steer(self, spread: float = 0.2) -> None:
-    angle = math.atan2(self.vy, self.vx)
-    angle += random.uniform(-spread, spread)
+        angle = math.atan2(self.vy, self.vx)
+        angle += random.uniform(-spread, spread)
 
-    speed = math.hypot(self.vx, self.vy)
+        speed = math.hypot(self.vx, self.vy)
 
-    self.vx = math.cos(angle) * speed
-    self.vy = math.sin(angle) * speed
+        self.vx = math.cos(angle) * speed
+        self.vy = math.sin(angle) * speed
 
 
     # TODO: Implement the three main boid behaviors: separation, alignment, and cohesion
@@ -107,20 +107,20 @@ class Boid:
     # Then divide by the number of nearby boids to get the average velocity, 
     # and subtract the current boid's velocity to get the alignment steering force.
     def _separation(self, boids: List['Boid']) -> pygame.Vector2:
-    steer = pygame.Vector2(0, 0)
+        steer = pygame.Vector2(0, 0)
 
-    for other in boids:
-        if other is self:
-            continue
+        for other in boids:
+            if other is self:
+                continue
 
-        dx = self.x - other.x
-        dy = self.y - other.y
-        distance = math.hypot(dx, dy)
+            dx = self.x - other.x
+            dy = self.y - other.y
+            distance = math.hypot(dx, dy)
 
-        if distance < config.SEPARATION_DISTANCE and distance > 0:
-            steer += pygame.Vector2(dx, dy) / distance
+            if distance < config.SEPARATION_DISTANCE and distance > 0:
+                steer += pygame.Vector2(dx, dy) / distance
 
-    return steer
+        return steer
     
     # Cohesion: steer toward the average position of nearby boids: 
     # _cohesion returns a vector pointing toward the average position of nearby boids
